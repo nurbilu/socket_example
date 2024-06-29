@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Application</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; }
+        #message-container { width: 90%; max-width: 600px; margin: 20px auto; border: 1px solid #ccc; padding: 10px; border-radius: 5px; overflow-y: auto; max-height: 400px; }
+        #message-form { display: flex; width: 90%; max-width: 600px; }
+        #message-form input { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px 0 0 5px; margin-right: -1px; }
+        #message-form button { padding: 10px; background-color: #007bff; border: 1px solid #007bff; color: white; cursor: pointer; border-radius: 0 5px 5px 0; }
+        #message-form button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div id="message-container"></div>
+    <form id="message-form" action="">
+        <input type="text" id="message-input" placeholder="Type a message...">
+        <button type="submit">Send</button>
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Connected to WebSocket server!');
+        });
+
+        socket.on('receiveMessage', (data) => {
+            const messageElement = document.createElement('div');
+            messageElement.textContent = data.message;
+            document.getElementById('message-container').appendChild(messageElement);
+        });
+
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const messageInput = document.getElementById('message-input');
+            const message = messageInput.value;
+            socket.emit('sendMessage', { message: message });
+            messageInput.value = '';
+        });
+    </script>
+</body>
+</html>
